@@ -171,8 +171,61 @@ var boroughs = L.geoJson(null, {
     });
   }
 });
-$.getJSON("data/sdf.geojson", function (data) {
+$.getJSON("data/commune.geojson", function (data) {
   boroughs.addData(data);
+});
+
+
+
+
+//Create a color dictionary based off of subway route_id
+var subwayColors = {"1":"#ff3135", "2":"#ff3135", "3":"ff3135", "4":"#009b2e",
+    "5":"#009b2e", "6":"#009b2e", "7":"#ce06cb", "A":"#fd9a00", "C":"#fd9a00",
+    "E":"#fd9a00", "SI":"#fd9a00","H":"#fd9a00", "Air":"#ffff00", "B":"#ffff00",
+    "D":"#ffff00", "F":"#ffff00", "M":"#ffff00", "G":"#9ace00", "FS":"#6e6e6e",
+    "GS":"#6e6e6e", "J":"#976900", "Z":"#976900", "L":"#969696", "N":"#ffff00",
+    "Q":"#ffff00", "R":"#ffff00" };
+
+var subwayLines = L.geoJson(null, {
+  style: function (feature) {
+      return {
+        color: "#F56741",
+        weight: 1,
+        opacity: 1
+      };
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Nom</th><td>" + feature.properties.NAME + "</td></tr>"  + "<table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Route);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+
+        }
+      });
+    }
+    layer.on({
+      mouseover: function (e) {
+        var layer = e.target;
+        layer.setStyle({
+          weight: 3,
+          color: "#00FFFF",
+          opacity: 1
+        });
+        if (!L.Browser.ie && !L.Browser.opera) {
+          layer.bringToFront();
+        }
+      },
+      mouseout: function (e) {
+        subwayLines.resetStyle(e.target);
+      }
+    });
+  }
+});
+$.getJSON("data/sdf.geojson", function (data) {
+  subwayLines.addData(data);
 });
 
 
@@ -488,7 +541,7 @@ var baseLayers = {
 var groupedOverlays = {
   "  Points d’intérêt ": {
     
-
+       "Quartier": subwayLines
    
      
   },
